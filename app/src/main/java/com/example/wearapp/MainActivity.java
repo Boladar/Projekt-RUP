@@ -224,6 +224,8 @@ public class MainActivity extends AppCompatActivity {
         alarmIntent.putExtra("notificationId", notificationId);
         alarmIntent.putExtra("title",title);
         alarmIntent.putExtra("message",message);
+        alarmIntent.putExtra("homeAddress", homeAddress);
+        alarmIntent.putExtra("workAddress", workAddress);
 
         //PendingIntent
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
@@ -305,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
                     String hourWake = timeOfAwaking.substring(0, 2);
                     String minuteWake = timeOfAwaking.substring(3, 5);
                     createNotification("Wake Up","Tramwaj numer: " + data.get(2) + "/Godzina odjazdu:" + data.get(1)
-                            + "/Ubranie:" + cloth, Integer.parseInt(hourWake), Integer.parseInt(minuteWake));
+                            + "/Ubranie:" + cloth + "/ Kliknij aby przejśc do map Google", Integer.parseInt(hourWake), Integer.parseInt(minuteWake));
 
                     Toast.makeText(MainActivity.this, "Powiadomienie nadejdzie o " + timeOfAwaking, Toast.LENGTH_LONG).show();
                 } catch (Exception e) {

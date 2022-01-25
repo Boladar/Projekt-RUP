@@ -4,8 +4,10 @@ import ClothingService.ClothingService;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +21,8 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.HttpURLConnection;
 //import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -138,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    class TraceData extends Thread {
+    class TraceData {
 
         public void getTraceByJson(String url) throws JSONException {
             //zwraca czas, kiedy trzeba wyjsc z domu i trase
@@ -174,18 +178,17 @@ public class MainActivity extends AppCompatActivity {
             data.add(line_transport);
         }
 
-        @Override
         public void run() {
             try {
-                URL url = new URL("https://maps.googleapis.com/maps/api/directions" +
-                        "/json?key=AIzaSyCNx1cp5ReJvuzJ5XqCBijNxy2B0mAUl_s&mode=transit&origin=" + homeAddress
-                        + "&destination=" + workAddress
-                        + "&arrival_time=" + epochS);
-                /*
-                test
-                URL url = new URL("https://maps.googleapis.com/maps/api/directions/json?origin=Os.SobieskiegoPoznan&destination=Druzbickiego2,Poznan&key=AIzaSyCNx1cp5ReJvuzJ5XqCBijNxy2B0mAUl_s&mode=transit&arrival_time=1640116800");
-                URL url = new URL("https://maps.googleapis.com/maps/api/directions/json?origin=Os.SobieskiegoPoznan&destination=Drużbickiego2,Poznań&key=AIzaSyCNx1cp5ReJvuzJ5XqCBijNxy2B0mAUl_s&arrival_time=1639428974");
-                */
+//                URL url = new URL("https://maps.googleapis.com/maps/api/directions" +
+//                        "/json?key=AIzaSyCNx1cp5ReJvuzJ5XqCBijNxy2B0mAUl_s&mode=transit&origin=" + homeAddress
+//                        + "&destination=" + workAddress
+//                        + "&arrival_time=" + epochS);
+
+//                test
+                URL url = new URL("https://maps.googleapis.com/maps/api/directions/json?origin=Os.SobieskiegoPoznan&destination=Dru%C5%BCbickiego2,Pozna%C5%84&key=AIzaSyCNx1cp5ReJvuzJ5XqCBijNxy2B0mAUl_s&mode=transit");
+//                URL url = new URL("https://maps.googleapis.com/maps/api/directions/json?origin=Os.SobieskiegoPoznan&destination=Drużbickiego2,Poznań&key=AIzaSyCNx1cp5ReJvuzJ5XqCBijNxy2B0mAUl_s&arrival_time=1639428974");
+
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -211,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void createNotification(String title, String message, int hour, int minute){
+    private void createNotification(String title, String message, int hour, int minute) {
 
         //Alarm/notification data
         final int notificationId = 1;
@@ -282,7 +285,11 @@ public class MainActivity extends AppCompatActivity {
                     assert timeOfWorkingStart != null;
                     epoch = (timeOfWorkingStart.getTime() / 1000);
                     epochS = Long.toString(epoch);
-                    new TraceData().start();
+
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
+
+                    new TraceData().run();
 
                     // Options for WeatherAPI
                     String city = "Poznan";

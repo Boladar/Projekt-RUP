@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
@@ -25,8 +26,13 @@ public class AlarmReceiver extends BroadcastReceiver {
         String message = intent.getStringExtra("message");
 
         // Call MainActivity when notification is tapped.
-        Intent mainIntent = new Intent(context, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, mainIntent, 0);
+//        Intent mainIntent = new Intent(context, MainActivity.class);
+//        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, mainIntent, 0);
+
+        Intent mapsIntent = new Intent(android.content.Intent.ACTION_VIEW,
+                Uri.parse("http://maps.google.com/maps?saddr=" + "Zakopianska 200A Poznan" + "&daddr=" + "Dabrowskiego 267 Poznan"));
+        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+        PendingIntent mapsPendingIntent = PendingIntent.getActivity(context,0,mapsIntent,0);
 
         // NotificationManager
         NotificationManager notificationManager =
@@ -46,7 +52,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle(title)
                 .setContentText(message)
-                .setContentIntent(contentIntent)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message + " https://maps.googleapis.com/maps/api/directions/json?origin=Os.SobieskiegoPoznan&destination=Dru%C5%BCbickiego2,Pozna%C5%84&key=AIzaSyCNx1cp5ReJvuzJ5XqCBijNxy2B0mAUl_s&mode=transit"))
+                .setContentIntent(mapsPendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true);
 

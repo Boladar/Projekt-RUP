@@ -1,31 +1,33 @@
 package com.example.wearapp;
 
-import ClothingService.ClothingService;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-//import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.Notifications.AlarmReceiver;
+
+import com.example.wearapp.Notification.AlarmReceiver;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-//import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,10 +58,9 @@ public class MainActivity extends AppCompatActivity {
     private int time;
 
 
-    class WeatherAPI extends AsyncTask<String, String, String> {
+    class WeatherAPI {
 
-        @Override
-        protected String doInBackground(String... strings) {
+        public String getWeather(String... strings) {
             HttpURLConnection connection = null;
             BufferedReader reader = null;
 
@@ -93,9 +94,8 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
 
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
+
+        public void parseWeather(String s) {
             JSONObject info = null;
             try {
                 info = new JSONObject(s);
@@ -138,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
             clothes.addAccessories(weather);
             cloth = clothes.getClothes();
             time = clothes.getTime();
-//            txtShow.setText(cloth + time);
         }
     }
 
@@ -180,16 +179,8 @@ public class MainActivity extends AppCompatActivity {
 
         public void run() {
             try {
-//                URL url = new URL("https://maps.googleapis.com/maps/api/directions" +
-//                        "/json?key=AIzaSyCNx1cp5ReJvuzJ5XqCBijNxy2B0mAUl_s&mode=transit&origin=" + homeAddress
-//                        + "&destination=" + workAddress
-//                        + "&arrival_time=" + epochS);
 
-//                test
                 URL url = new URL("https://maps.googleapis.com/maps/api/directions/json?origin=Os.SobieskiegoPoznan&destination=Dru%C5%BCbickiego2,Pozna%C5%84&key=AIzaSyCNx1cp5ReJvuzJ5XqCBijNxy2B0mAUl_s&mode=transit");
-//                URL url = new URL("https://maps.googleapis.com/maps/api/directions/json?origin=Os.SobieskiegoPoznan&destination=Drużbickiego2,Poznań&key=AIzaSyCNx1cp5ReJvuzJ5XqCBijNxy2B0mAUl_s&arrival_time=1639428974");
-
-
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
                 connection.setRequestMethod("GET");
@@ -222,8 +213,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Intent
         alarmIntent.putExtra("notificationId", notificationId);
-        alarmIntent.putExtra("title",title);
-        alarmIntent.putExtra("message",message);
+        alarmIntent.putExtra("title", title);
+        alarmIntent.putExtra("message", message);
         alarmIntent.putExtra("homeAddress", homeAddress);
         alarmIntent.putExtra("workAddress", workAddress);
 
@@ -233,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         //AlarmManager
-        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         // Create time.
         Calendar startTime = Calendar.getInstance();
@@ -298,15 +289,18 @@ public class MainActivity extends AppCompatActivity {
                     String key = "992e7cab06164165980213921210812";
                     String url = "https://api.weatherapi.com/v1/history.json?key=" + key +
                             "&q=" + city + "&dt=" + dataOfWorkingStart;
-                    new WeatherAPI().execute(url);
+
+                    WeatherAPI weatherAPI = new WeatherAPI();
+                    weatherAPI.parseWeather(weatherAPI.getWeather(url));
 
                     // Parsing time for create notification
                     timeFormat = new SimpleDateFormat("HH:mm");
-                    long millis = Long.parseLong(String.valueOf(Integer.parseInt(data.get(0))-(time*60+20*60)));
-                    timeOfAwaking = timeFormat.format(new Date(millis * 1000));
+                    //long millis = Long.parseLong(String.valueOf(Integer.parseInt(data.get(0))-(time*60+20*60)));
+                    long millis = System.currentTimeMillis();
+                    timeOfAwaking = timeFormat.format(new Date(millis));
                     String hourWake = timeOfAwaking.substring(0, 2);
                     String minuteWake = timeOfAwaking.substring(3, 5);
-                    createNotification("Wake Up","Tramwaj numer: " + data.get(2) + "/Godzina odjazdu:" + data.get(1)
+                    createNotification("Wake Up", "Tramwaj numer: " + data.get(2) + "/Godzina odjazdu:" + data.get(1)
                             + "/Ubranie:" + cloth + "/ Kliknij aby przejśc do map Google", Integer.parseInt(hourWake), Integer.parseInt(minuteWake));
 
                     Toast.makeText(MainActivity.this, "Powiadomienie nadejdzie o " + timeOfAwaking, Toast.LENGTH_LONG).show();
@@ -328,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
 //                    while ((str = bufferread.readLine()) != null) {
 //                        strbuff.append(str + "\n");
 //                    }
-                    Toast.makeText(MainActivity.this, "Powiadomienie nadejdzie o " + timeOfAwaking, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Powiadomienie nadejdzie o " + timeOfAwaking, Toast.LENGTH_LONG).show();
 //                } catch (FileNotFoundException e) {
 //                    e.printStackTrace();
 //                } catch (IOException e) {

@@ -1,4 +1,4 @@
-package com.example.Notifications;
+package com.example.wearapp.Notification;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -10,8 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
-
-import com.example.wearapp.MainActivity;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -26,11 +24,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         String message = intent.getStringExtra("message");
         String homeAddress = intent.getStringExtra("homeAddress");
         String workAddress = intent.getStringExtra("workAddress");
-
-
-        // Call MainActivity when notification is tapped.
-//        Intent mainIntent = new Intent(context, MainActivity.class);
-//        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, mainIntent, 0);
 
         Intent mapsIntent = new Intent(android.content.Intent.ACTION_VIEW,
                 Uri.parse("http://maps.google.com/maps?saddr=" + homeAddress + "&daddr=" + workAddress));
